@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import seqeval.metrics as seqeval_metrics
 import torch
-from sklearn.metrics import f1_score, matthews_corrcoef
+from sklearn.metrics import f1_score, matthews_corrcoef, recall_score, precision_score, confusion_matrix
 from scipy.stats import pearsonr, spearmanr
 from typing import Dict, List
 
@@ -258,6 +258,134 @@ class AccAndF1EvaluationScheme(BaseLogitsEvaluationScheme):
         }
         return Metrics(major=minor["acc_and_f1"], minor=minor)
 
+class MultiF1TextClassificationEvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.argmax(logits, axis=1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        # noinspection PyUnresolvedReferences
+        acc = float((preds == labels).mean())
+        labels = np.array(labels)
+        f1 = f1_score(y_true=labels, y_pred=preds, average='micro')
+        recall = recall_score(y_true=labels, y_pred=preds, average='micro')
+        precision = precision_score(y_true=labels, y_pred=preds, average='micro')
+        # tn, fp, fn, tp = confusion_matrix(labels, preds).ravel()
+        # specificity = tn / (tn+fp)
+        # rs1=2*recall*specificity/(recall+specificity)
+        minor = {
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "acc": acc,
+            # "specificity": specificity,
+            # "rs1": rs1,
+        }
+        return Metrics(major=minor["f1"], minor=minor)
+
+class F1TextClassificationEvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.argmax(logits, axis=1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        # noinspection PyUnresolvedReferences
+        acc = float((preds == labels).mean())
+        labels = np.array(labels)
+        f1 = f1_score(y_true=labels, y_pred=preds)
+        recall = recall_score(y_true=labels, y_pred=preds)
+        precision = precision_score(y_true=labels, y_pred=preds)
+        tn, fp, fn, tp = confusion_matrix(labels, preds).ravel()
+        specificity = tn / (tn+fp)
+        rs1=2*recall*specificity/(recall+specificity)
+        minor = {
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "acc": acc,
+            "specificity": specificity,
+            "rs1": rs1,
+        }
+        return Metrics(major=minor["f1"], minor=minor)
+
+class AccuracyTextClassificationEvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.argmax(logits, axis=1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        # noinspection PyUnresolvedReferences
+        acc = float((preds == labels).mean())
+        labels = np.array(labels)
+        f1 = f1_score(y_true=labels, y_pred=preds)
+        recall = recall_score(y_true=labels, y_pred=preds)
+        precision = precision_score(y_true=labels, y_pred=preds)
+        tn, fp, fn, tp = confusion_matrix(labels, preds).ravel()
+        specificity = tn / (tn+fp)
+        rs1=2*recall*specificity/(recall+specificity)
+        minor = {
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "acc": acc,
+            "specificity": specificity,
+            "rs1": rs1,
+        }
+        return Metrics(major=minor["acc"], minor=minor)
+
+class MultiAccuracyTextClassificationEvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.argmax(logits, axis=1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        # noinspection PyUnresolvedReferences
+        acc = float((preds == labels).mean())
+        labels = np.array(labels)
+        f1 = f1_score(y_true=labels, y_pred=preds, average='micro')
+        recall = recall_score(y_true=labels, y_pred=preds, average='micro')
+        precision = precision_score(y_true=labels, y_pred=preds, average='micro')
+        # tn, fp, fn, tp = confusion_matrix(labels, preds).ravel()
+        # specificity = tn / (tn+fp)
+        # rs1=2*recall*specificity/(recall+specificity)
+        minor = {
+            "precision": precision,
+            "recall": recall,
+            "f1": f1,
+            "acc": acc,
+            # "specificity": specificity,
+            # "rs1": rs1,
+        }
+        return Metrics(major=minor["acc"], minor=minor)
+
+class RS1EvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.argmax(logits, axis=1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        # noinspection PyUnresolvedReferences
+        #acc = float((preds == labels).mean())
+        labels = np.array(labels)
+        f1 = f1_score(y_true=labels, y_pred=preds)
+        recall = recall_score(y_true=labels, y_pred=preds)
+        precision = precision_score(y_true=labels, y_pred=preds)
+        tn, fp, fn, tp = confusion_matrix(labels, preds).ravel()
+        specificity = tn / (tn+fp)
+        rs1=2*recall*specificity/(recall+specificity)
+        minor = {
+            "recall": recall,
+            "f1": f1,
+            "precision": precision,
+            "specificity": specificity,
+            "rs1": rs1,
+        }
+        return Metrics(major=minor["rs1"], minor=minor)
 
 class MCCEvaluationScheme(BaseLogitsEvaluationScheme):
     def get_preds_from_accumulator(self, task, accumulator):
@@ -289,6 +417,23 @@ class PearsonAndSpearmanEvaluationScheme(BaseLogitsEvaluationScheme):
         }
         return Metrics(major=minor["corr"], minor=minor)
 
+class SpearmanEvaluationScheme(BaseLogitsEvaluationScheme):
+    def get_labels_from_cache_and_examples(self, task, cache, examples):
+        return get_label_vals_from_cache(cache=cache)
+
+    def get_preds_from_accumulator(self, task, accumulator):
+        logits = accumulator.get_accumulated()
+        return np.squeeze(logits, axis=-1)
+
+    @classmethod
+    def compute_metrics_from_preds_and_labels(cls, preds, labels):
+        pearson_corr = float(pearsonr(preds, labels)[0])
+        spearman_corr = float(spearmanr(preds, labels)[0])
+        minor = {
+            "pearson": pearson_corr,
+            "spearmanr": spearman_corr
+        }
+        return Metrics(major=minor["spearmanr"], minor=minor)
 
 class MultipleChoiceAccuracyEvaluationScheme(BaseLogitsEvaluationScheme):
     def get_accumulator(self):
@@ -895,6 +1040,16 @@ def get_evaluation_scheme_for_task(task) -> BaseEvaluationScheme:
         return Bucc2018EvaluationScheme()
     elif isinstance(task, tasks.TatoebaTask):
         return TatoebaEvaluationScheme()
+    elif isinstance(task, (tasks.TSVTextClassificationTask, tasks.TSVTwoTextClassificationTask)):
+        try:
+            return globals()[task.evaluation_scheme]()
+        except AttributeError:
+            return F1TextClassificationEvaluationScheme()
+    elif isinstance(task, (tasks.TSVTextRegressionTask, tasks.TSVTwoTextRegressionTask)):
+        try:
+            return globals()[task.evaluation_scheme]()
+        except AttributeError:
+            return SpearmanEvaluationScheme()
     else:
         raise KeyError(task)
 

@@ -57,6 +57,10 @@ from jiant.tasks.lib.wsc import WSCTask
 from jiant.tasks.lib.xnli import XnliTask
 from jiant.tasks.lib.xquad import XquadTask
 
+
+from jiant.tasks.lib.tsv_text_classification import  TSVTextClassificationTask, TSVTwoTextClassificationTask
+from jiant.tasks.lib.tsv_text_regression import  TSVTextRegressionTask, TSVTwoTextRegressionTask
+
 from jiant.tasks.core import Task
 from jiant.utils.python.io import read_json
 
@@ -117,6 +121,10 @@ TASK_DICT = {
     "wsc": WSCTask,
     "xnli": XnliTask,
     "xquad": XquadTask,
+    "tsv_text_classification": TSVTextClassificationTask,
+    "tsv_two_text_classification": TSVTwoTextClassificationTask,
+    "tsv_text_regression": TSVTextRegressionTask,
+    "tsv_two_text_regression": TSVTwoTextRegressionTask,
 }
 
 
