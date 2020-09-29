@@ -216,8 +216,10 @@ class JiantMetarunner(AbstractMetarunner):
         )
         self.log_writer.write_entry("train_val", val_state.to_dict())
         if self.best_val_state is None or val_state.score > self.best_val_state.score:
+        # if True:
             self.best_val_state = val_state.new()
             self.log_writer.write_entry("train_val_best", self.best_val_state.to_dict())
+            # if False:
             if self.save_best_model:
                 save_model_with_metadata(
                     model=self.model,
